@@ -35,6 +35,4 @@ node_modules
 # dotenv
 .env
 
-/lib
-
 /docs
