@@ -173,8 +173,8 @@ class Bulb extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async getPowerState (sendOptions) {
-    let lightState = await this.lighting.getLightState(sendOptions);
-    return (lightState.on_off === 1);
+    let {on_off} = await this.lighting.getLightState(sendOptions);
+    return (on_off === 1);
   }
   /**
    * Sets on/off state of Bulb.
@@ -185,7 +185,8 @@ class Bulb extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async setPowerState (value, sendOptions) {
-    return this.lighting.setLightState({on_off: (value ? 1 : 0)}, sendOptions);
+    const {dft_on_state = {}} = await this.lighting.getLightState(sendOptions)
+    return this.lighting.setLightState(Object.assign(dft_on_state, {on_off: (value ? 1 : 0)}), sendOptions);
   }
   /**
    * Toggles state of Bulb.
@@ -195,9 +196,9 @@ class Bulb extends Device {
    * @return {Promise<boolean, ResponseError>}
    */
   async togglePowerState (sendOptions) {
-    const powerState = await this.getPowerState(sendOptions);
-    await this.setPowerState(!powerState, sendOptions);
-    return !powerState;
+    const {dft_on_state = {}, on_off} = await this.lighting.getLightState(sendOptions)
+    await this.lighting.setLightState(Object.assign(dft_on_state, {on_off: (!on_off ? 1 : 0)}), sendOptions);
+    return !on_off;
   }
 }
 
